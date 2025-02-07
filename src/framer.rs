@@ -47,7 +47,7 @@ impl<'a, TRng> Framer<'a, TRng, crate::Client>
 where
     TRng: RngCore,
 {
-    pub async fn connect<S: Read + Write + Send>(
+    pub async fn connect<S: Read + Write>(
         &mut self,
         mut stream: S,
         websocket_options: &WebSocketOptions<'_>,
@@ -96,7 +96,7 @@ impl<'a, TRng> Framer<'a, TRng, crate::Server>
 where
     TRng: RngCore,
 {
-    pub async fn accept<S: Read + Write + Send>(
+    pub async fn accept<S: Read + Write>(
         &mut self,
         mut stream: S,
         websocket_context: &WebSocketContext,
@@ -141,7 +141,7 @@ where
     }
 
     // calling close on a websocket that has already been closed by the other party has no effect
-    pub async fn close<S: Read + Write + Send>(
+    pub async fn close<S: Read + Write>(
         &mut self,
         mut stream: S,
         close_status: WebSocketCloseStatusCode,
@@ -158,7 +158,7 @@ where
         Ok(())
     }
 
-    pub async fn write<S: Read + Write + Send>(
+    pub async fn write<S: Read + Write>(
         &mut self,
         mut stream: S,
         message_type: WebSocketSendMessageType,
@@ -179,7 +179,7 @@ where
     // frame_buf should be large enough to hold an entire websocket text frame
     // this function will block until it has recieved a full websocket frame.
     // It will wait until the last fragmented frame has arrived.
-    pub async fn read<'b, S: Read + Write + Send>(
+    pub async fn read<'b, S: Read + Write>(
         &mut self,
         mut stream: S,
         frame_buf: &'b mut [u8],
@@ -261,7 +261,7 @@ where
         }
     }
 
-    async fn send_back<S: Read + Write + Send>(
+    async fn send_back<S: Read + Write>(
         &mut self,
         mut stream: S,
         frame_buf: &'_ mut [u8],
