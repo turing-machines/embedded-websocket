@@ -725,6 +725,9 @@ where
         match &mut self.continuation_read {
             Some(continuation_read) => {
                 let result = read_continuation(continuation_read, from_buffer, to_buffer);
+                if continuation_read.count == 0 {
+                    self.continuation_read = None;
+                }
                 if result.is_fin_bit_set {
                     self.continuation_read = None;
                     self.continuation_frame_op_code = None;
@@ -732,11 +735,13 @@ where
                 Ok(result)
             }
             None => {
-                let (mut result, continuation_read) = read_frame(from_buffer, to_buffer)?;
-
+                let (mut result, mut continuation_read) = read_frame(from_buffer, to_buffer)?;
                 // override the op code we get from the result with our continuation frame opcode if it exists
                 if let Some(continuation_frame_op_code) = self.continuation_frame_op_code {
                     result.op_code = continuation_frame_op_code;
+                    if let Some(continuation) = &mut continuation_read {
+                        continuation.op_code = continuation_frame_op_code;
+                    }
                 }
 
                 // reset the continuation frame op code to None if this is the last fragment (or there is no fragmentation)
